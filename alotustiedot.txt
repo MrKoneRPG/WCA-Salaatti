@@ -1,0 +1,8 @@
+Nykyinen ongelma:
+Asikkaan/käyttäjän mielestä järjestelmä on epä intuitiivinen ja sekava.
+
+Keitä ovat käyttäjät?
+Käyttäjät muita yrityksiä, jotka tilaavat kyseisellä applikaatiolla salaatti pöydän täytön käyttäen.
+
+Mikä on "end goal"?
+Clutterin vähennys, väri, intuivisuus, yksinkertaistaa design, raahauksen poisto
