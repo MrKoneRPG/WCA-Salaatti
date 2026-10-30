@@ -1,33 +1,41 @@
 import express from "express";
 import cors from "cors";
 
-type LearningEntryData = {
-  id: number;
-  topic: string;
-  date: string;
-  learned: string;
-  confidence: number;
-  // Add your own property from Flip 2 here.
+type ProductData = {
+  productCode: number;
+  EAN: number;
+  productName: string;
+  category: string;
+  packageSize: number;
+  GnSize: string;
+  price: number;
+  imageUrl: string;
 };
 
 const app = express();
 app.use(cors());
 const PORT = 3001;
 
-const entries: LearningEntryData[] = [
+const entries: ProductData[] = [
   {
-    id: 1,
-    topic: "React Components",
-    date: "2026-10-22",
-    learned: "Components help us reuse UI code.",
-    confidence: 3
+    productCode: 95429,
+    EAN: 6406510954293,
+    productName: "Ananas suikale tuore",
+    category: "Hedelmät",
+    packageSize: 1.00,
+    GnSize: "GN 1/4",
+    price: 5.60,
+    imageUrl: "HeeHee",
   },
   {
-    id: 2,
-    topic: "React State",
-    date: "2026-10-27",
-    learned: "State lets the interface react to changes.",
-    confidence: 2
+    productCode: 95429,
+    EAN: 6406510954293,
+    productName: "Ananas suikale tuore",
+    category: "Hedelmät",
+    packageSize: 1.00,
+    GnSize: "GN 1/4",
+    price: 5.60,
+    imageUrl: "HeeHee",
   }
 ];
 
