@@ -1,18 +1,16 @@
-import type { ProductData } from "../types/ProductData";
+import type { ProductData } from '../types/ProductData'
 
 type ProductProps = {
-  entry: ProductData;
-};
-
-function ProductInfo({ entry}: ProductProps) {
-  return (
-    <article>
-      <h2>{entry.name}</h2>
-      <p>{entry.category}</p>
-      <p>{entry.gnsize}</p>
-      <p>{entry.price}</p>
-    </article>
-  );
+  entry: ProductData
 }
 
-export default ProductInfo;
+function Product({ entry }: ProductProps) {
+  return (
+    <article>
+      <h3>{entry.name}</h3>
+      <p>{entry.category} · {entry.gnsize} · {entry.price.toFixed(2)} €</p>
+    </article>
+  )
+}
+
+export default Product

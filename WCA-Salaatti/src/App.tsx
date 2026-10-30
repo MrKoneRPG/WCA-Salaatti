@@ -1,91 +1,71 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import './App.css'
-
-type ProductData = {
-  id: number
-  name: string
-  category: string
-  gnsize: string
-  price: number
-}
-
-const initialEntries: ProductData[] = []
+import type { ProductData } from './types/ProductData'
+import Product from './components/Product'
 
 function App() {
-  const [entries, setEntries] = useState<ProductData[]>(initialEntries)
+  const [entries, setEntries] = useState<ProductData[]>([])
 
-  // Statet
-  const [name, setName] = useState("")
-  const [category, setCategory] = useState("")
-  const [gnsize, setGnsize] = useState("")
+  const [name, setName] = useState('')
+  const [category, setCategory] = useState('')
+  const [gnsize, setGnsize] = useState('')
   const [price, setPrice] = useState(0)
 
-  function handleAddEntry() {
-    // Product luonti
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!name.trim()) return
+
     const newEntry: ProductData = {
       id: Date.now(),
-      name: name,
-      category: category,
-      gnsize: gnsize,
-      price: price,
+      name: name.trim(),
+      category: category.trim(),
+      gnsize: gnsize.trim(),
+      price,
     }
 
-    setEntries((currentEntries) => [...currentEntries, newEntry])
+    setEntries((current) => [...current, newEntry])
 
-    // Formin resetointi
-    setName("")
-    setCategory("")
-    setGnsize("")
+    setName('')
+    setCategory('')
+    setGnsize('')
     setPrice(0)
   }
 
   return (
     <main>
-      <form>
-        <label htmlFor="name">Name</label>
-        <input
-          id="name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-        <br />
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name">Name</label>
+          <input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+        </div>
 
-        <label htmlFor="category">Category</label>
-        <input
-          id="category"
-          value={category}
-          onChange={(event) => setCategory(event.target.value)}
-        />
-        <br />
+        <div>
+          <label htmlFor="category">Category</label>
+          <input id="category" value={category} onChange={(e) => setCategory(e.target.value)} />
+        </div>
 
-        <label htmlFor="gnsize">Size</label>
-        <textarea
-          id="gnsize"
-          value={gnsize}
-          onChange={(event) => setGnsize(event.target.value)}
-        />
-        <br />
+        <div>
+          <label htmlFor="gnsize">Size</label>
+          <input id="gnsize" value={gnsize} onChange={(e) => setGnsize(e.target.value)} />
+        </div>
 
-        <label htmlFor="price">Price</label>
-        <input
-          id="price"
-          type="number"
-          min={0}
-          value={price}
-          onChange={(event) => setPrice(Number(event.target.value))}
-        />
-        <br />
+        <div>
+          <label htmlFor="price">Price (€)</label>
+          <input
+            id="price"
+            type="number"
+            min={0}
+            step="0.01"
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+          />
+        </div>
 
-        <button type="button" onClick={handleAddEntry}>
-          Add entry
-        </button>
+        <button type="submit">Add entry</button>
       </form>
 
       {entries.map((entry) => (
-        <div key={entry.id}>
-          <h3>{entry.name}</h3>
-          <p>{entry.category} · {entry.gnsize} · {entry.price} €</p>
-        </div>
+        <Product key={entry.id} entry={entry} />
       ))}
     </main>
   )
