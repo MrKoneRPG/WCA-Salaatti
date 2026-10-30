@@ -1,7 +1,10 @@
 export type ProductData = {
-  id: number
-  name: string
-  category: string
-  gnsize: string
-  price: number
+  productCode: number;
+  EAN: number;
+  productName: string;
+  category: string;
+  packageSize: number;
+  GnSize: string;
+  price: number;
+  imageUrl: string;
 }
