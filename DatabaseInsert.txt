@@ -17,7 +17,7 @@ CREATE TABLE products (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    UNIQUE KEY (productCode)
+    
 );
 INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95429',6406510954293,'Ananas suikale tuore','GN 1/4',5.6,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/ananassuikale_tuore_t.png',1.0,'');
 INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95067',6406511950676,'Cantaloupe meloni kuutio','GN 1/4',5.76,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/cantaloupemeloni_kuutio_t.png',1.2,'');
