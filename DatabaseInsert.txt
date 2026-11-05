@@ -1,0 +1,93 @@
+DataBasea varten scriptit, jotta saat kaiken toimimaan
+
+CREATE DATABASE IF NOT EXISTS (opiskelianumero)_wcasalad
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE products (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    productCode VARCHAR(50) NOT NULL,
+    ean VARCHAR(20) NULL,
+    productName VARCHAR(255) NOT NULL,
+    gnSize VARCHAR(50) NULL,
+    price DECIMAL(10,2) NULL,
+    image VARCHAR(500) NULL,
+    packageSize VARCHAR(100) NULL,
+    dietaryInfo VARCHAR(255) NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    UNIQUE KEY (productCode)
+);
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95429',6406510954293,'Ananas suikale tuore','GN 1/4',5.6,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/ananassuikale_tuore_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95067',6406511950676,'Cantaloupe meloni kuutio','GN 1/4',5.76,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/cantaloupemeloni_kuutio_t.png',1.2,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95066',6406511950669,'Hunajameloni pala','GN 1/4',5.76,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/hunajameloni_pala_t.png',1.2,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95069',6406511950690,'Melonimix','GN 1/4',5.76,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/melonimix_t.png',1.2,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95069',6406511950690,'Melonimix mini','GN 1/4',5.76,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/melonimixmini_t.png',1.2,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70382',6406510703822,'Tropical crunch','GN 1/4',6.5,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/tropicalcrunch_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95068',6406511950683,'Vesimeloni pieni pala','',4.8,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/vesimeloni_pienipala_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95070',6406511950706,'Viinirypäle tumma','',7.08,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/viinirypale_tumma_t.png',1.2,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70385',6406510703853,'Aurinkokuivattu tomaatti','',8.8,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/aurinkokuivattu-tomaatti_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95089',6406511950898,'Cheddarjuusto kuutio','GN 1/4',10.9,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/cheddarjuustokuutio_t.png',1.0,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70386',6406510703860,'Juustolastu','GN 1/4',7.9,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/juustolastu_t.png',0.5,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95084',6406510950844,'Leipäjuusto kuutio','GN 1/4',11.9,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/leipajuusto-kuutio_t.png',1.0,'VL');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95573',6406510955733,'Mozzarellapallo pestomarinoitu','GN 1/4',7.56,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/mozzarellapallo-pestomarinoitu_t.png',0.7,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70312',6406510703129,'Oliivimix','GN 1/4',3.9,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/oliivimix_t.png',0.5,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95221',6406510952213,'Papumix vinegrette-kastikkeessa','GN 1/6',6.4,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/papumix-vinegrette-kastikkeessa_t.png',1.0,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70310',6406510703105,'Pico de gallo','GN 1/4',3.45,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/pico-de-callo_t.png',0.5,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70311',6406510703112,'Pikkelöity punasipulirengas','',2.7,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/pikkeloity-punasipulirengas_t.png',0.5,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70089',6406510700890,'Pikkelöity tuorekurkku','',5.4,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/pikkeloity-tuorekurkku_t.png',1.0,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95377',6406510953777,'Raejuusto','GN 1/4',8.12,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/raejuusto_t.png',1.4,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95085',6406511950850,'Salaattijuusto','GN 1/4',8.9,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/salaattijuusto_t.png',1.0,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95418',6406510954187,'Sitruunamarinoitu parsakaali','',3.72,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/sitruunamarinoitu-parsakaali_t.png',0.6,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70293',6406510702931,'Sweet & green mix','GN 1/4',7.5,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/sweet-green-mix_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70088',6406510700883,'Tzatziki','',5.9,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/tzatziki_t.png',1.0,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70381',6406510703815,'Yrttimozzarella viipale','GN 1/4',10.8,'https://www.cc.puv.fi/~asa/fresh/images/juustot_lisukkeet/yrttimozzarella-viipale_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95038',6406510950387,'Broilerin fileekuutio','GN 1/4',10.9,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/broilerin-fileekuutio_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70059',6406510700593,'Falafelpyörykkä','GN 1/4',7.9,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/falafelpyorykka_t.png',1.0,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70060',6406510700609,'Harissa-kanapyörykkä','',10.9,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/harissa_kanapyorykka_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95031',6406510950318,'Kananmuna kokonainen','',8.06,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/kananmuna-kokonainen_t.png',1.3,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95030',6406510950301,'Kananmuna puolikas','',8.06,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/kananmuna-puolikas_t.png',1.3,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70384',6406510703846,'Korean pulled pork','',11.4,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/korean-pulledpork_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('90275',6406510902751,'Kotimainen broilerin fileeviipale','',8.72,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/kotimainen-broilerin-fileeviipale_t.png',0.8,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70292',6406510702924,'Sweety chicken','',10.9,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/sweetychicken_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95447',6406510954477,'Tacomaustettu broilerin fileesuikale','',9.81,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/tacomaustettu-broilerin-fileesuikale_t.png',0.9,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95446',6406510954460,'Tex mex broileri','GN 1/4',8.93,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/texmex-broileri_t.png',0.85,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70380',6406510703808,'Tex mex tofu','',7.6,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/texmex-tofu_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70377',6406510703778,'Tom yam broileri','',10.9,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/tomyam_broileri_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95039',6406510950394,'Tonnikalapalat öljyssä','GN 1/4',17.94,'https://www.cc.puv.fi/~asa/fresh/images/proteiinit/tonnikalapalat_oljyssa_t.png',1.3,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95450',6406510954507,'Broileri-pastasalaatti','',13.08,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/broileri-pastasalaatti_t.png',1.2,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95413',6406510954132,'Chilipasta','GN 1/4',7.56,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/chilipasta_t.png',1.2,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70166',6406510701668,'Dijonslaw','',5.2,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/dijonslaw_t.png',1.0,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70087',6406510700876,'Fiesta-pasta','',6.3,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/fiesta-pasta_t.png',1.0,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70033',6406510700333,'Greenslaw','GN 1/4',5.2,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/greenslaw_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70379',6406510703792,'Katkarapu crunch','',15.9,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/katkarapucrunch_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95151',6406510951513,'Katkarapusalaatti','GN 1/2',25,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/katkarapusalaatti_t.png',2.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95448',6406510954484,'Linssi-kvinoasalaatti','',6.9,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/linssi-kvinoasalaatti_t.png',1.0,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70154',6406510701545,'Maalaisperunasalaatti','GN 1/4',6.72,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/maalaisperunasalaatti_t.png',1.2,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95445',6406510954453,'Maissi','GN 1/4',4.2,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/maissi_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95091',6406510950912,'Meetwursti-kinkku pastasalaatti','',7.56,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/meetwursti-kinkku-pastasalaatti_t.png',1.2,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70378',6406510703785,'Raikas kesäkaura','',6.9,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/raikas-kesakaura_t.png',1.0,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95556',6406510955566,'Raikas raastesalaatti','',5.2,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/raikas-raastesalaatti_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95449',6406510954491,'Risoni-pastasekoitus','',8.19,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/risoni-pastasekoitus_t.png',1.3,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70165',6406510701651,'Savukirjolohi-pastasalaatti','',15.48,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/savukirjolohi-pastasalaatti_t.png',1.2,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95572',6406510955726,'Tabbouleh','GN 1/4',6.9,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/tabbouleh_t.png',1.0,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70086',6406510700869,'Tomaatti-oliivipasta','GN 1/4',7.8,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/tomaatti-oliivipasta_t.png',1.0,'V');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95451',6406510954514,'Vihreä pestopasta','GN 1/4',5.67,'https://www.cc.puv.fi/~asa/fresh/images/ruokaisat_komponentit/vihrea-pestopasta_t.png',0.9,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('90341',6406510903413,'Jäävuorisalaatti leikattu','',3.9,'https://www.cc.puv.fi/~asa/fresh/images/salaattipohjat/jäävuorisalaatti leikattu T.png',1.0,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70022',6406510700227,'Kuninkaallinen salaattimix','',2.75,'https://www.cc.puv.fi/~asa/fresh/images/salaattipohjat/kuninkaallinen salaattimix T.png',0.5,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('90280',6406510902805,'Provensaalisalaatti','',2.65,'https://www.cc.puv.fi/~asa/fresh/images/salaattipohjat/provensaalisalaatti T.png',0.5,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('90221',6406510902218,'Saariston salaattisekoitus','',4.8,'https://www.cc.puv.fi/~asa/fresh/images/salaattipohjat/saariston salaattisekoitus T.png',1.0,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('9142',6406510091424,'Salaattimix rose','',4.6,'https://www.cc.puv.fi/~asa/fresh/images/salaattipohjat/salaattimix rose T.png',1.0,'L');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95291',6406510952916,'Miniluumutomaattimix','GN 1/4',5.64,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/miniluumutomaattimix_t.png',1.2,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('90441',6406510904410,'Paprika mix kuutio','',5.8,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/paprikamixkuutio_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95008',6406510950080,'Paprika mix suikale','GN 1/4',5.6,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/paprikamixsuikale_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95059',6406511950591,'Porkkanaraaste lingottu','GN 1/4',2.56,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/porkkanaraaste-lingottu_t.png',0.8,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('90411',6406510904113,'Punasipuli kuutio','',3.9,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/punasipulikuutio_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95060',6406511950607,'Punasipulirengas','GN 1/4',3.12,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/punasipulirengas_t.png',0.8,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70179',6406510701798,'Tomaatti kuutio','GN 1/4',4.5,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/tomaattikuutio_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95002',6406510950028,'Tomaatti viipale','GN 1/4',4.5,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/tomaattiviipale_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('90314',6406510903147,'Tuorekurkku kuutio','GN 1/4',3.6,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/tuorekurkkukuutio_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95007',6406510950073,'Tuorekurkku suikale','GN 1/4',3.6,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/tuorekurkkusuikale_t.png',1.0,'');
+INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70383',6406510703839,'Tuorekurkku viipale','GN 1/4',3.6,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/tuorekurkkuviipale_t.png',1.0,'');
+SELECT *FROM products;
