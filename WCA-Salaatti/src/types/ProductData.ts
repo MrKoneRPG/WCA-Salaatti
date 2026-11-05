@@ -6,4 +6,5 @@ export type ProductData = {
   category: string
   gnsize: string
   price: number
+  imageUrl: string
 }

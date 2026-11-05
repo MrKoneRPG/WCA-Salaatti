@@ -50,7 +50,7 @@ function App() {
         inputMode="numeric"
         value={productCode}
         onChange={(e) => setProductCode(e.target.value)}
-      />
+      />  
     </div>
 
     <div>
