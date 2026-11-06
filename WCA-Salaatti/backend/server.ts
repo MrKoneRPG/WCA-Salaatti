@@ -33,7 +33,7 @@ app.get("/api/entries", async (req, res) => {
     const [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT id, productCode, ean, productName, gnSize,
               price, image, packageSize, dietaryInfo
-       FROM opiskelijanumero_wcasalad
+       FROM products
        ORDER BY id`
     );
 
@@ -65,7 +65,7 @@ app.post("/api/entries", async (req, res) => {
 
   try {
     const [result] = await pool.execute<ResultSetHeader>(
-      `INSERT INTO opiskelijanumero_wcasalad
+      `INSERT INTO products
        (productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
