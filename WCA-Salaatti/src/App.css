@@ -268,3 +268,33 @@
 .layout.products-hidden {
   grid-template-columns: 62px minmax(0, 1fr) 300px;
 }
+
+/*------------ Loading states ------------*/
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.product-card.skeleton {
+  pointer-events: none;
+}
+
+.skeleton-image,
+.skeleton-text {
+  background: #d9d9d9;
+  border-radius: 4px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.skeleton-image { width: 100%; aspect-ratio: 1; }
+.skeleton-text  { width: 70%; height: 0.9rem; margin-top: 0.5rem; }

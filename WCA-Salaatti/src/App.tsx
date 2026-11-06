@@ -1,41 +1,54 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import type { ProductData } from './types/ProductData'
-import Product from './components/Product'
+
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
 
 // The salad bar always has 2 rows, so these are the size options:
 // 4 = 2 + 2, 6 = 3 + 3, 8 = 4 + 4, 10 = 5 + 5, 12 = 6 + 6
 const SIZE_TEMPLATES = [4, 6, 8, 10, 12]
 const MAX_SLOTS = 12
+const SKELETON_COUNT = 6 // grey placeholder cards shown while loading
 
 function App() {
-  const [entries] = useState<ProductData[]>([])
-  const [serverEntries, setServerEntries] = useState<ProductData[]>([])
+  const [products, setProducts] = useState<ProductData[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [reloadCount, setReloadCount] = useState(0)
 
-  // The product you're currently "holding"
+  
   const [selected, setSelected] = useState<ProductData | null>(null)
-  // The salad bar slots. null = empty slot. Starts as 4 (2 + 2).
   const [slots, setSlots] = useState<(ProductData | null)[]>([null, null, null, null])
-  // Is the Products column open?
   const [showProducts, setShowProducts] = useState(true)
 
-  async function loadServerEntries() {
-    setLoadError('')
-    try {
-      const response = await fetch('http://localhost:3001/api/entries')
-      if (!response.ok) throw new Error('Could not load entries')
-      const data: ProductData[] = await response.json()
-      // The backend sends the picture as "image", our type calls it "imageUrl"
-      setServerEntries(
-        data.map((product) => ({
-          ...product,
-          imageUrl: product.imageUrl ?? (product as unknown as { image: string }).image,
-        })),
-      )
-    } catch {
-      setLoadError('Could not connect to the backend.')
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function loadProducts() {
+      try {
+        const response = await fetch(`${API_URL}/api/products`, {
+          signal: controller.signal,
+        })
+        if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+        const data: ProductData[] = await response.json()
+        setProducts(data)
+      } catch (err) {
+        if (controller.signal.aborted) return
+        console.error(err)
+        setLoadError('Could not load products. Is the backend running?')
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false)
+      }
     }
+
+    loadProducts()
+    return () => controller.abort()
+  }, [reloadCount])
+
+  function retryLoad() {
+    setLoadError('')
+    setIsLoading(true)
+    setReloadCount((count) => count + 1)
   }
 
   // Click a product: pick it up, or put it down if it was already picked
@@ -57,8 +70,7 @@ function App() {
     setSlots(slots.map((slot, i) => (i === index ? null : slot)))
   }
 
-  // Change the bar to a new size. Products already placed keep their spot;
-  // if the bar gets smaller, the slots at the end are removed.
+  // Change the bar to a new size. Products already placed keep their spot.
   function resizeBar(newSize: number) {
     const resized = []
     for (let i = 0; i < newSize; i++) {
@@ -67,7 +79,6 @@ function App() {
     setSlots(resized)
   }
 
-  // + adds one column = 2 slots (one on top, one below)
   function addColumn() {
     if (slots.length < MAX_SLOTS) {
       resizeBar(slots.length + 2)
@@ -87,7 +98,6 @@ function App() {
       </header>
 
       <main className={showProducts ? 'layout' : 'layout products-hidden'}>
-        {/* LEFT: products (can be hidden) */}
         <aside className="column products">
           <div className="column-header">
             {showProducts && <h2>Products</h2>}
@@ -103,35 +113,58 @@ function App() {
 
           {showProducts && (
             <>
-              {entries.map((entry) => (
-                <Product key={entry.productCode} entry={entry} />
-              ))}
+              {isLoading && (
+                <>
+                  <p className="loading-state" role="status">
+                    <span className="spinner" aria-hidden="true" />
+                    Loading products…
+                  </p>
+                  <ul className="product-grid" aria-hidden="true">
+                    {Array.from({ length: SKELETON_COUNT }, (_, i) => (
+                      <li key={i} className="product-card skeleton">
+                        <div className="skeleton-image" />
+                        <div className="skeleton-text" />
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
-              <button type="button" onClick={loadServerEntries}>
-                Load from backend
-              </button>
-              {loadError && <p>{loadError}</p>}
+              {loadError && (
+                <div role="alert">
+                  <p>{loadError}</p>
+                  <button type="button" onClick={retryLoad}>
+                    Try again
+                  </button>
+                </div>
+              )}
 
-              <ul className="product-grid">
-                {serverEntries.map((entry) => (
-                  <li
-                    key={entry.productCode}
-                    className={
-                      selected?.productCode === entry.productCode
-                        ? 'product-card selected'
-                        : 'product-card'
-                    }
-                    onClick={() => selectProduct(entry)}
-                  >
-                    {entry.imageUrl ? (
-                      <img src={entry.imageUrl} alt={entry.productName} />
-                    ) : (
-                      <div className="no-image">{entry.productName.charAt(0)}</div>
-                    )}
-                    <span>{entry.productName}</span>
-                  </li>
-                ))}
-              </ul>
+              {!isLoading && !loadError && products.length === 0 && (
+                <p>No products found.</p>
+              )}
+
+              {products.length > 0 && (
+                <ul className="product-grid">
+                  {products.map((entry) => (
+                    <li
+                      key={entry.productCode}
+                      className={
+                        selected?.productCode === entry.productCode
+                          ? 'product-card selected'
+                          : 'product-card'
+                      }
+                      onClick={() => selectProduct(entry)}
+                    >
+                      {entry.imageUrl ? (
+                        <img src={entry.imageUrl} alt={entry.productName} />
+                      ) : (
+                        <div className="no-image">{entry.productName.charAt(0)}</div>
+                      )}
+                      <span>{entry.productName}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </>
           )}
         </aside>
@@ -141,7 +174,6 @@ function App() {
           <div className="column-header">
             <h2>Salad bar</h2>
 
-            {/* Size templates + add-column button */}
             <div className="bar-sizes">
               {SIZE_TEMPLATES.map((size) => (
                 <button
@@ -197,7 +229,7 @@ function App() {
                       type="button"
                       className="slot-clear"
                       onClick={(e) => {
-                        e.stopPropagation() // don't also trigger the slot's own click
+                        e.stopPropagation()
                         clearSlot(index)
                       }}
                     >
