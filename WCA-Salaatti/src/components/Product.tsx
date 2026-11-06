@@ -7,8 +7,11 @@ type ProductProps = {
 function Product({ entry }: ProductProps) {
   return (
     <article>
-      <h3>{entry.name}</h3>
-      <p>{entry.category} · {entry.gnsize} · {entry.price.toFixed(2)} €</p>
+      {entry.imageUrl && (
+        <img src={entry.imageUrl} alt={entry.productName} loading="lazy" />
+      )}
+      <h3>{entry.productName}</h3>
+      <p>{entry.GnSize} · {entry.price.toFixed(2)} €</p>
     </article>
   )
 }

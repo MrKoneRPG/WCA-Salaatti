@@ -4,6 +4,22 @@ import type { RowDataPacket, ResultSetHeader } from "mysql2";
 import express from "express";
 import cors from "cors";
 
+const PRODUCT_COLUMNS = `
+  id,
+  productCode,
+  ean AS EAN,
+  productName,
+  gnSize AS GnSize,
+  price,
+  image AS imageUrl,
+  packageSize,
+  dietaryInfo
+`;
+
+function toProduct(row: RowDataPacket) {
+  return { ...row, price: Number(row.price) };
+}
+
 type ProductData = {
   productCode: number;
   EAN: number;
@@ -28,12 +44,10 @@ const pool = mysql.createPool({
 });
 const PORT = 3001;
 
-app.get("/api/entries", async (req, res) => {
+app.get("/api/products", async (req, res) => {
   try {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT id, productCode, ean, productName, gnSize,
-              price, image, packageSize, dietaryInfo
-       FROM products
+      `SELECT ${PRODUCT_COLUMNS} FROM products
        ORDER BY id`
     );
 
@@ -44,7 +58,31 @@ app.get("/api/entries", async (req, res) => {
   }
 });
 
-app.post("/api/entries", async (req, res) => {
+app.get("/api/products/:id", async (req, res) => {
+  const { id } = req.params;
+
+  if (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id))) {
+    return res.status(400).json({ error: "Product id must be a positive whole number" });
+  }
+
+  try {
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT ${PRODUCT_COLUMNS} FROM products WHERE id = ?`,
+      [Number(id)]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    
+    res.status(200).json(toProduct(rows[0]));
+  } catch (error) {
+    console.error("Database query failed:", error instanceof Error ? error.message : "Unknown error");
+    res.status(500).json({ error: "Could not load the product" });
+  }
+});
+
+app.post("/api/products", async (req, res) => {
   const { productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo } = req.body;
 
   const isNonEmptyString = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
