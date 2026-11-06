@@ -114,3 +114,52 @@ INSERT INTO categories(productCategories) VALUES('RuokaisetKomponentit');
 INSERT INTO categories(productCategories) VALUES('Salaattipohjat');
 INSERT INTO categories(productCategories) VALUES('Tuoreetsalaatit');
 SELECT *FROM categories;
+
+
+
+Categorin liittäminen productiin
+
+Ensin luo kaikille tuotteille uusi id kenttä.
+
+UPDATE products
+SET categoryId = 1
+WHERE id IN (1,2,3,4,5,6,7,8);
+
+UPDATE products
+SET categoryId = 2
+WHERE id IN (9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24);
+
+UPDATE products
+SET categoryId = 3
+WHERE id IN (25,26,27,28,29,30,31,32,33,34,35,36,37);
+
+UPDATE products
+SET categoryId = 4
+WHERE id IN (38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55);
+
+UPDATE products
+SET categoryId = 5
+WHERE id IN (56,57,58,59,60);
+
+UPDATE products
+SET categoryId = 6
+WHERE id IN (61,62,63,64,65,66,67,68,69,70,71);
+
+select *from products;
+
+ALTER TABLE products
+ADD CONSTRAINT fk_products_categories
+FOREIGN KEY (categoryId)
+REFERENCES categories(id);
+
+Testaa toimiiko:
+
+SELECT
+    p.id,
+    p.productCode,
+    p.productName,
+    p.price,
+    c.productCategories AS categoryName
+FROM products p
+LEFT JOIN categories c
+    ON p.categoryId = c.id;
