@@ -96,7 +96,7 @@ SELECT *FROM products;
 
 Categories database varten komennot:
 
-CREATE TABLE products (
+CREATE TABLE categories (
     id INT(11) NOT NULL AUTO_INCREMENT,
     productCategories VARCHAR(50) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
