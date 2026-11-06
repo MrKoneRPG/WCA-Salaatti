@@ -23,7 +23,7 @@ function App() {
   async function loadServerEntries() {
     setLoadError('')
     try {
-      const response = await fetch('http://localhost:3001/api/entries')
+      const response = await fetch('http://localhost:3001/api/products')
       if (!response.ok) throw new Error('Could not load entries')
       const data: ProductData[] = await response.json()
       // The backend sends the picture as "image", our type calls it "imageUrl"
