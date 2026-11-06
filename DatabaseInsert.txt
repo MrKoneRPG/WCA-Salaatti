@@ -16,7 +16,7 @@ CREATE TABLE products (
     dietaryInfo VARCHAR(255) NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    PRIMARY KEY (id),
+    PRIMARY KEY (id)
     
 );
 INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95429',6406510954293,'Ananas suikale tuore','GN 1/4',5.6,'https://www.cc.puv.fi/~asa/fresh/images/hedelmat/ananassuikale_tuore_t.png',1.0,'');
@@ -91,3 +91,26 @@ INSERT INTO products(productCode, ean, productName, gnSize, price, image, packag
 INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('95007',6406510950073,'Tuorekurkku suikale','GN 1/4',3.6,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/tuorekurkkusuikale_t.png',1.0,'');
 INSERT INTO products(productCode, ean, productName, gnSize, price, image, packageSize, dietaryInfo) VALUES('70383',6406510703839,'Tuorekurkku viipale','GN 1/4',3.6,'https://www.cc.puv.fi/~asa/fresh/images/tuoreet_salaatit/tuorekurkkuviipale_t.png',1.0,'');
 SELECT *FROM products;
+
+
+
+Categories database varten komennot:
+
+CREATE TABLE products (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    productCategories VARCHAR(50) NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id)
+    
+);
+
+
+
+INSERT INTO categories(productCategories) VALUES('Hedelmat');
+INSERT INTO categories(productCategories) VALUES('Juustot&lisukkeet');
+INSERT INTO categories(productCategories) VALUES('Proteinit');
+INSERT INTO categories(productCategories) VALUES('RuokaisetKomponentit');
+INSERT INTO categories(productCategories) VALUES('Salaattipohjat');
+INSERT INTO categories(productCategories) VALUES('Tuoreetsalaatit');
+SELECT *FROM categories;
