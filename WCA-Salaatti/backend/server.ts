@@ -86,6 +86,21 @@ app.post("/api/entries", async (req, res) => {
   }
 });
 
+app.get("/api/categories", async (req, res) => {
+  try{
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT id, productCategories
+      FROM productCategories
+      ORDER BY id`
+    );
+    res.json(rows);
+  }
+  catch(error){
+    console.error("Database quary failed:", error instanceof Error ? error.message : "Unknow Error");
+    res.status(500).json({error : "Could not load the backend"})
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });
