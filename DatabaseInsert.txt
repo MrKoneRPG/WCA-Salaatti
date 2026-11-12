@@ -166,3 +166,16 @@ SELECT
 FROM products p
 LEFT JOIN categories c
     ON p.categoryId = c.id;
+Carts taulukon luonti osuus:
+    CREATE TABLE carts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    capacity INT NOT NULL CHECK (capacity >= 0),
+    createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+Tehdään testi data:
+
+INSERT INTO carts(name,capacity) VALUES('Testi','2');
+INSERT INTO carts(name,capacity) VALUES('Cart-10','10');
+INSERT INTO carts(name,capacity) VALUES('Cart-15','15');
+SELECT *FROM carts;
