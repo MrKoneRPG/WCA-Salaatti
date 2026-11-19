@@ -179,3 +179,26 @@ INSERT INTO carts(name,capacity) VALUES('Testi','2');
 INSERT INTO carts(name,capacity) VALUES('Cart-10','10');
 INSERT INTO carts(name,capacity) VALUES('Cart-15','15');
 SELECT *FROM carts;
+
+Plan ja position database osioiden luonti:
+
+CREATE TABLE plans(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    cart_id VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE plan_positions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    plan_id INT NOT NULL,
+    position_number INT NOT NULL,
+    product_id INT NOT NULL,
+
+    CONSTRAINT fk_plan_positions_plan
+        FOREIGN KEY (plan_id)
+        REFERENCES plans(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_plan_position
+        UNIQUE (plan_id, position_number)
+);
