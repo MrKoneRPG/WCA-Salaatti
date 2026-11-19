@@ -139,6 +139,18 @@ app.get("/api/categories", async (req, res) => {
   }
 });
 
+app.get("/api/carts", async (req, res) => {
+  try {
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT id, name, capacity FROM carts ORDER BY id`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Database query failed:", error instanceof Error ? error.message : "Unknown error");
+    res.status(500).json({ error: "Could not load the carts" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });
