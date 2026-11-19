@@ -14,12 +14,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
-  border-bottom: 1px solid var(--border);
+  background: var(--header-bg);
+  border-bottom: 3px solid var(--accent);
 }
 
 .site-header h1 {
   font-size: 28px;
   margin: 16px 0;
+  color: var(--header-text);
 }
 
 .site-header nav {
@@ -28,15 +30,16 @@
 }
 
 .site-header nav a {
-  color: var(--text);
+  color: var(--header-text);
+  opacity: 0.75;
   text-decoration: none;
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;
 }
 
 .site-header nav a.active {
-  color: var(--text-h);
-  border-bottom-color: var(--accent);
+  opacity: 1;
+  border-bottom-color: var(--header-text);
 }
 
 /* ---------- Three columns ---------- */
@@ -103,6 +106,7 @@
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 4px;
+  flex-shrink: 0;
 }
 
 .product-card .no-image {
@@ -112,6 +116,77 @@
   font-size: 22px;
   color: var(--text);
 }
+/* ---------- Product search ---------- */
+.product-search {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: none;
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.product-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ---------- Categories ---------- */
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.category-chip {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.category-chip:hover {
+  border-color: var(--accent);
+}
+
+.category-chip.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+/* Shown when the search matches nothing */
+.no-results {
+  margin-top: 12px;
+  padding: 16px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.no-results p {
+  margin: 0 0 8px;
+  color: var(--text-h);
+  overflow-wrap: anywhere;
+}
+
+.no-results button {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+}
+
 /* ---------- Selected product (left column) ---------- */
 .product-card.selected {
   border-color: var(--accent);
@@ -124,13 +199,12 @@
   margin: 0 0 12px;
 }
 
-/* 4 across × 3 down = room for all 12 slots without scrolling */
+/* Always 2 rows; the column count is set in App.tsx */
 .slot-grid {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -139,9 +213,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* start from the top so every picture lines up */
   gap: 4px;
-  padding: 8px;
+  padding: 28px 8px 8px;       /* top padding leaves room for the × button */
   border: 2px dashed var(--border);
   border-radius: 8px;
   cursor: pointer;
@@ -157,16 +231,55 @@
   border-style: solid;
 }
 
+/* "Empty" text stays centred in empty slots */
+.slot:not(.filled) {
+  justify-content: center;
+  padding-top: 8px;
+}
+
 .slot:hover {
   border-color: var(--accent);
 }
 
+/* Same picture size in every slot; never squeezed by long names */
 .slot img,
 .slot .no-image {
   height: 60%;
+  max-width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* One word per line; only a word too wide for the box gets … */
+.product-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.product-name > span {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Big bars (15+): never hide letters, long words wrap (with a hyphen where supported) */
+.wrap-names .product-name > span {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.wrap-names .slot {
+  font-size: 12px;
 }
 
 .slot .no-image {
@@ -174,14 +287,6 @@
   place-items: center;
   background: var(--code-bg);
   font-size: 22px;
-}
-
-.slot-number {
-  position: absolute;
-  top: 4px;
-  left: 8px;
-  font-size: 11px;
-  color: var(--text);
 }
 
 .slot-empty {
@@ -205,11 +310,6 @@
   color: var(--accent);
   font-size: 36px;
 }
-/* ---------- Salad bar: always 2 rows ---------- */
-.slot-grid {
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-}
-
 /* Heading + buttons on one line at the top of a column */
 .column-header {
   display: flex;
@@ -223,10 +323,18 @@
   margin: 0;
 }
 
-/* Size template buttons: 4 6 8 10 12 + */
+/* Size buttons: 10 15, Custom dropdown, − + */
 .bar-sizes {
   display: flex;
+  align-items: center;
   gap: 4px;
+}
+
+.custom-size {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
 }
 
 .size-button {
@@ -251,7 +359,7 @@
   cursor: default;
 }
 
-/* ---------- Hide/show Products ---------- */
+/* ---------- Hide/show Products and Cost accounting ---------- */
 .toggle-products {
   width: 28px;
   height: 28px;
@@ -268,3 +376,42 @@
 .layout.products-hidden {
   grid-template-columns: 62px minmax(0, 1fr) 300px;
 }
+
+/* When hidden, the right column shrinks to just the ‹ button */
+.layout.costs-hidden {
+  grid-template-columns: 260px minmax(0, 1fr) 62px;
+}
+
+.layout.products-hidden.costs-hidden {
+  grid-template-columns: 62px minmax(0, 1fr) 62px;
+}
+
+/*------------ Loading states ------------*/
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.product-card.skeleton {
+  pointer-events: none;
+}
+
+.skeleton-image,
+.skeleton-text {
+  background: var(--code-bg);
+  border-radius: 4px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.skeleton-image { width: 100%; aspect-ratio: 1; }
+.skeleton-text  { width: 70%; height: 0.9rem; margin-top: 0.5rem; }
