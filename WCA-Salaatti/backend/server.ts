@@ -178,6 +178,84 @@ app.post("/api/plans", async (req, res) => {
   }
 });
 
+app.get("/api/plans/:id" , async (req,res) =>{
+  const { id } = req.params;
+
+  if(!/^[1-9]\d*$/.test(id))
+  {
+    return res.status(400).json({
+      error: "Plan id must be a positive whole number"
+    });
+  }
+  try{
+    const [planRows] = await pool.execute<RowDataPacket[]>(
+  `SELECT id, name, cart_id
+   FROM plans
+   WHERE id = ?`,
+  [Number(id)]
+);
+
+if (planRows.length === 0) {
+  return res.status(404).json({
+    error: "Plan not found"
+  });
+}
+
+const plan = planRows[0];
+    const [cartRows] = await pool.execute<RowDataPacket[]>(
+      `SELECT capacity
+      FROM carts
+      WHERE id = ?`,
+      [plan.cart_id]
+     );
+     const capacity = Number(cartRows[0].capacity);
+
+     const [positionRows] =
+     await pool.execute<RowDataPacket[]>(
+      `SELECT position_number, product_id
+      FROM plan_positions
+      WHERE plan_id = ?
+      ORDER BY position_number`,
+    [plan.id]);
+
+    const positions = [];
+    for (let i = 1;i <= capacity;i++)
+    {
+      positions.push({
+        positionNumber: i,
+        productId: null
+      });
+    }
+    for (const row of positionRows)
+    {
+      positions[row.position_number - 1] = {
+        positionNumber: row.position_number,
+        productId: row.product_id
+      };
+    }
+    return res.json({
+    id: plan.id,
+    name: plan.name,
+    cartId: plan.cart_id,
+    positions
+  });
+}
+  catch(error){
+   console.error(
+      "Database quary failed:",
+      error instanceof Error
+      ? error.message
+      : "Unknown error"
+    );
+
+    return res.status(500).json({
+      error: "Could not load plan"
+    });
+  }
+  });
+  
+
+
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });
