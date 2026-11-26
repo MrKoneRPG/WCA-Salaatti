@@ -151,6 +151,33 @@ app.get("/api/carts", async (req, res) => {
   }
 });
 
+app.post("/api/plans", async (req, res) => {
+  const { name, cartId, positions } = req.body;
+
+  const isNonEmptyString = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
+
+  if (
+    !isNonEmptyString(name) ||
+    !isNonEmptyString(cartId) ||
+    !Array.isArray(positions) ||
+    !positions.every(pos => typeof pos === "object" && pos !== null && isNonEmptyString(pos.productCode) &&
+     Number.isInteger(pos.slotIndex) && pos.slotIndex >= 0)
+  ) {
+    return res.status(400).json({ error: "Invalid plan entry" });
+  }
+
+  try {
+    const [result] = await pool.execute<ResultSetHeader>(
+      `INSERT INTO plans (name, CartId, positions) VALUES (?, ?, ?)`,
+      [name.trim(), cartId.trim(), JSON.stringify(positions)]
+    );
+    res.status(201).json({ id: result.insertId });
+  } catch (error) {
+    console.error("Could not save entry:", error instanceof Error ? error.message : "Unknown error");
+    res.status(500).json({ error: "Could not save entry" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });
