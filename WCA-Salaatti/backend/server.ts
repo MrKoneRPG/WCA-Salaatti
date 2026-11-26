@@ -3,6 +3,8 @@ import mysql from "mysql2/promise";
 import type { RowDataPacket, ResultSetHeader } from "mysql2";
 import express from "express";
 import cors from "cors";
+import type { plan } from "../src/types/plan";
+import { validatePlan } from "./validators/planValidators";
 
 const PRODUCT_COLUMNS = `
   id,
@@ -20,17 +22,6 @@ function toProduct(row: RowDataPacket) {
   return { ...row, price: Number(row.price) };
 }
 
-type ProductData = {
-  productCode: number;
-  EAN: number;
-  productName: string;
-  category: string;
-  packageSize: number;
-  GnSize?: string;
-  price: number;
-  imageUrl: string;
-};
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -43,6 +34,29 @@ const pool = mysql.createPool({
   dateStrings: true
 });
 const PORT = 3001;
+
+function isPlanInput(value: unknown): value is plan {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.name === "string" &&
+    candidate.name.trim() !== "" &&
+    typeof candidate.cartId === "string" &&
+    candidate.cartId.trim() !== "" &&
+    Array.isArray(candidate.positions) &&
+    candidate.positions.every(
+      position =>
+        typeof position === "object" &&
+        position !== null &&
+        Number.isInteger(position.positionNumber) &&
+        (position.productId === null ||
+          (Number.isInteger(position.productId) && position.productId > 0))
+    )
+  );
+}
 
 app.get("/api/products", async (req, res) => {
   try {
@@ -151,30 +165,79 @@ app.get("/api/carts", async (req, res) => {
   }
 });
 
+app.get("/api/plans", async (req, res) => {
+  try {
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT id, name, cart_id AS cartId FROM plans ORDER BY id`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Database query failed:", error instanceof Error ? error.message : "Unknown error");
+    res.status(500).json({ error: "Could not load the plans" });
+  }
+});
+
 app.post("/api/plans", async (req, res) => {
-  const { name, cartId, positions } = req.body;
-
-  const isNonEmptyString = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
-
-  if (
-    !isNonEmptyString(name) ||
-    !isNonEmptyString(cartId) ||
-    !Array.isArray(positions) ||
-    !positions.every(pos => typeof pos === "object" && pos !== null && isNonEmptyString(pos.productCode) &&
-     Number.isInteger(pos.slotIndex) && pos.slotIndex >= 0)
-  ) {
+  if (!isPlanInput(req.body)) {
     return res.status(400).json({ error: "Invalid plan entry" });
   }
 
+  const newPlan: plan = {
+    name: req.body.name.trim(),
+    cartId: req.body.cartId.trim(),
+    positions: req.body.positions
+  };
+
+  let validation;
   try {
-    const [result] = await pool.execute<ResultSetHeader>(
-      `INSERT INTO plans (name, CartId, positions) VALUES (?, ?, ?)`,
-      [name.trim(), cartId.trim(), JSON.stringify(positions)]
-    );
-    res.status(201).json({ id: result.insertId });
+    validation = await validatePlan(newPlan, pool);
   } catch (error) {
-    console.error("Could not save entry:", error instanceof Error ? error.message : "Unknown error");
-    res.status(500).json({ error: "Could not save entry" });
+    console.error("Plan validation query failed:", error instanceof Error ? error.message : "Unknown error");
+    return res.status(500).json({ error: "Could not validate the plan" });
+  }
+
+  if (!validation.valid) {
+    return res.status(400).json({ error: "Invalid plan entry", details: validation.errors });
+  }
+
+  let connection: Awaited<ReturnType<typeof pool.getConnection>> | undefined;
+  let transactionStarted = false;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+    transactionStarted = true;
+
+    const [result] = await connection.execute<ResultSetHeader>(
+      `INSERT INTO plans (name, cart_id) VALUES (?, ?)`,
+      [newPlan.name, newPlan.cartId]
+    );
+
+    for (const position of newPlan.positions) {
+      if (position.productId === null) {
+        continue;
+      }
+
+      await connection.execute<ResultSetHeader>(
+        `INSERT INTO plan_positions (plan_id, position_number, product_id) VALUES (?, ?, ?)`,
+        [result.insertId, position.positionNumber, position.productId]
+      );
+    }
+
+    await connection.commit();
+    transactionStarted = false;
+    res.status(201).json({ ...newPlan, id: result.insertId });
+  } catch (error) {
+    if (transactionStarted && connection) {
+      try {
+        await connection.rollback();
+      } catch (rollbackError) {
+        console.error("Plan transaction rollback failed:", rollbackError instanceof Error ? rollbackError.message : "Unknown error");
+      }
+    }
+    console.error("Could not save plan:", error instanceof Error ? error.message : "Unknown error");
+    res.status(500).json({ error: "Could not save the plan" });
+  } finally {
+    connection?.release();
   }
 });
 

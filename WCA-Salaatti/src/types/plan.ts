@@ -1,4 +1,4 @@
-import type { planPosition } from "./planPosition"
+import type { planPosition } from "./planPosition.js"
 
 export type plan = 
 {
