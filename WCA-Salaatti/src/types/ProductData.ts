@@ -7,5 +7,5 @@ export type ProductData = {
   packageSize: number;
   GnSize: string;
   price: number;
-  imageUrl: string;
+  imageUrl?: string;
 }

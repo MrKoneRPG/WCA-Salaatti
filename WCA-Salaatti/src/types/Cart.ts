@@ -1,6 +1,5 @@
-export interface categories
-{
-    id: string,
-    name: string,
-    capacity: number
+export type Cart = {
+  id: string
+  name: string
+  capacity: number
 }
