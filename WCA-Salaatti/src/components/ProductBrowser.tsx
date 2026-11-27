@@ -17,7 +17,7 @@ export default function ProductBrowser({
 
   const filteredProducts = products.filter((product) => {
     const searchLower = search.toLowerCase();
-
+    //testi kommentti, korjasko emailin
     const matchesSearch =
       product.productName.toLowerCase().includes(searchLower) ||
       String(product.productCode)
