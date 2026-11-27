@@ -298,3 +298,27 @@
 
 .skeleton-image { width: 100%; aspect-ratio: 1; }
 .skeleton-text  { width: 70%; height: 0.9rem; margin-top: 0.5rem; }
+
+.product-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.no-results {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.size-input {
+  width: 56px;
+  padding: 4px 6px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
