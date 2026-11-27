@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import './App.css'
 import type { ProductData } from './types/ProductData'
 import Product from './components/Product'
@@ -103,7 +103,10 @@ function App() {
         </nav>
       </header>
 
-      <main className="layout" style={{ gridTemplateColumns: layoutColumns }}>
+      <main
+        className="layout"
+        style={{ '--layout-columns': layoutColumns } as CSSProperties}
+      >
         <aside className="column products">
           <div className="column-header">
             {showProducts && <h2>Products</h2>}
@@ -224,7 +227,7 @@ function App() {
 
           <div
             className="slot-grid"
-            style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+            style={{ gridTemplateColumns: `repeat(${columns}, minmax(64px, 1fr))` }}
           >
             {slots.map((product, index) => (
               <div
@@ -262,7 +265,7 @@ function App() {
         </section>
 
         <aside className="column costs">
-                    <div className="column-header">
+          <div className="column-header">
             <button
               type="button"
               className="toggle-products"
