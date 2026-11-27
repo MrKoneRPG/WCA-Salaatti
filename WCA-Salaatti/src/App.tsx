@@ -1,89 +1,97 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import type { ProductData } from './types/ProductData'
+import Product from './components/Product'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+const SIZE_TEMPLATES = [10, 15]
+const DEFAULT_SIZE = 10
+const MIN_SLOTS = 2
+const MAX_SLOTS = 30
 
-// The salad bar always has 2 rows, so these are the size options:
-// 4 = 2 + 2, 6 = 3 + 3, 8 = 4 + 4, 10 = 5 + 5, 12 = 6 + 6
-const SIZE_TEMPLATES = [4, 6, 8, 10, 12]
-const MAX_SLOTS = 12
-const SKELETON_COUNT = 6 // grey placeholder cards shown while loading
+const PRODUCTS_WIDTH = '260px'
+const COSTS_WIDTH = '300px'
+const COLLAPSED_WIDTH = '62px'
 
 function App() {
-  const [products, setProducts] = useState<ProductData[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [entries] = useState<ProductData[]>([])
+  const [serverEntries, setServerEntries] = useState<ProductData[]>([])
   const [loadError, setLoadError] = useState('')
-  const [reloadCount, setReloadCount] = useState(0)
+  const [loaded, setLoaded] = useState(false)
+  const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<ProductData | null>(null)
-  const [slots, setSlots] = useState<(ProductData | null)[]>([null, null, null, null])
+  const [slots, setSlots] = useState<(ProductData | null)[]>(Array(DEFAULT_SIZE).fill(null))
+  const [sizeInput, setSizeInput] = useState(String(DEFAULT_SIZE))
   const [showProducts, setShowProducts] = useState(true)
+  const [showCosts, setShowCosts] = useState(true)
 
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function loadProducts() {
-      try {
-        const response = await fetch(`${API_URL}/api/products`, {
-          signal: controller.signal,
-        })
-        if (!response.ok) throw new Error(`Request failed: ${response.status}`)
-        const data: ProductData[] = await response.json()
-        setProducts(data)
-      } catch (err) {
-        if (controller.signal.aborted) return
-        console.error(err)
-        setLoadError('Could not load products. Is the backend running?')
-      } finally {
-        if (!controller.signal.aborted) setIsLoading(false)
-      }
-    }
-
-    loadProducts()
-    return () => controller.abort()
-  }, [reloadCount])
-
-  function retryLoad() {
+  async function loadServerEntries() {
     setLoadError('')
-    setIsLoading(true)
-    setReloadCount((count) => count + 1)
-  }
-
-  // Click a product: pick it up, or put it down if it was already picked
-  function selectProduct(product: ProductData) {
-    if (selected?.productCode === product.productCode) {
-      setSelected(null)
-    } else {
-      setSelected(product)
+    try {
+      const response = await fetch('http://localhost:3001/api/products')
+      if (!response.ok) throw new Error('Could not load entries')
+      const data: ProductData[] = await response.json()
+      // The backend sends the picture as "image", our type calls it "imageUrl"
+      setServerEntries(
+        data.map((product) => ({
+          ...product,
+          imageUrl: product.imageUrl ?? (product as unknown as { image: string }).image,
+        })),
+      )
+      setLoaded(true)
+    } catch {
+      setLoadError('Could not connect to the backend.')
     }
   }
 
-  // Click a slot: put the selected product there
+  const searchTerm = search.trim().toLowerCase()
+  const visibleProducts = serverEntries.filter(
+    (entry) =>
+      entry.productName.toLowerCase().includes(searchTerm) ||
+      String(entry.productCode).toLowerCase().includes(searchTerm),
+  )
+
+  function selectProduct(product: ProductData) {
+    setSelected(selected === product ? null : product)
+  }
+
   function placeInSlot(index: number) {
     if (!selected) return
     setSlots(slots.map((slot, i) => (i === index ? selected : slot)))
+    setSelected(null)
   }
 
   function clearSlot(index: number) {
     setSlots(slots.map((slot, i) => (i === index ? null : slot)))
   }
 
-  // Change the bar to a new size. Products already placed keep their spot.
+  // Products keep their spot; shrinking removes slots from the end
   function resizeBar(newSize: number) {
+    const size = Math.min(MAX_SLOTS, Math.max(MIN_SLOTS, Math.round(newSize)))
     const resized = []
-    for (let i = 0; i < newSize; i++) {
+    for (let i = 0; i < size; i++) {
       resized.push(slots[i] ?? null)
     }
     setSlots(resized)
+    setSizeInput(String(size))
   }
 
-  function addColumn() {
-    if (slots.length < MAX_SLOTS) {
-      resizeBar(slots.length + 2)
+  function applySizeInput() {
+    const value = Number(sizeInput)
+    if (sizeInput.trim() === '' || Number.isNaN(value)) {
+      setSizeInput(String(slots.length))
+      return
     }
+    resizeBar(value)
   }
 
-  const columns = slots.length / 2
+  // 2 rows; odd sizes put the extra slot on the top row
+  const columns = Math.ceil(slots.length / 2)
+
+  const layoutColumns = [
+    showProducts ? PRODUCTS_WIDTH : COLLAPSED_WIDTH,
+    'minmax(0, 1fr)',
+    showCosts ? COSTS_WIDTH : COLLAPSED_WIDTH,
+  ].join(' ')
 
   return (
     <>
@@ -95,7 +103,7 @@ function App() {
         </nav>
       </header>
 
-      <main className={showProducts ? 'layout' : 'layout products-hidden'}>
+      <main className="layout" style={{ gridTemplateColumns: layoutColumns }}>
         <aside className="column products">
           <div className="column-header">
             {showProducts && <h2>Products</h2>}
@@ -111,63 +119,52 @@ function App() {
 
           {showProducts && (
             <>
-              {isLoading && (
+              {entries.map((entry) => (
+                <Product key={entry.productCode} entry={entry} />
+              ))}
+
+              {!loaded ? (
                 <>
-                  <p className="loading-state" role="status">
-                    <span className="spinner" aria-hidden="true" />
-                    Loading products…
-                  </p>
-                  <ul className="product-grid" aria-hidden="true">
-                    {Array.from({ length: SKELETON_COUNT }, (_, i) => (
-                      <li key={i} className="product-card skeleton">
-                        <div className="skeleton-image" />
-                        <div className="skeleton-text" />
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-
-              {loadError && (
-                <div role="alert">
-                  <p>{loadError}</p>
-                  <button type="button" onClick={retryLoad}>
-                    Try again
+                  <button type="button" onClick={loadServerEntries}>
+                    Load from backend
                   </button>
-                </div>
+                  {loadError && <p>{loadError}</p>}
+                </>
+              ) : (
+                <input
+                  type="search"
+                  className="product-search"
+                  placeholder="Search products..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
               )}
 
-              {!isLoading && !loadError && products.length === 0 && (
-                <p>No products found.</p>
+              {loaded && visibleProducts.length === 0 && (
+                <p className="no-results">No products match "{search}".</p>
               )}
 
-              {products.length > 0 && (
-                <ul className="product-grid">
-                  {products.map((entry) => (
-                    <li
-                      key={entry.productCode}
-                      className={
-                        selected?.productCode === entry.productCode
-                          ? 'product-card selected'
-                          : 'product-card'
-                      }
-                      onClick={() => selectProduct(entry)}
-                    >
-                      {entry.imageUrl ? (
-                        <img src={entry.imageUrl} alt={entry.productName} />
-                      ) : (
-                        <div className="no-image">{entry.productName.charAt(0)}</div>
-                      )}
-                      <span>{entry.productName}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <ul className="product-grid">
+                {visibleProducts.map((entry) => (
+                  <li
+                    // productCode alone isn't unique in the data, so name is added
+                    key={`${entry.productCode}-${entry.productName}`}
+                    className={selected === entry ? 'product-card selected' : 'product-card'}
+                    onClick={() => selectProduct(entry)}
+                  >
+                    {entry.imageUrl ? (
+                      <img src={entry.imageUrl} alt={entry.productName} />
+                    ) : (
+                      <div className="no-image">{entry.productName.charAt(0)}</div>
+                    )}
+                    <span>{entry.productName}</span>
+                  </li>
+                ))}
+              </ul>
             </>
           )}
         </aside>
 
-        {/* MIDDLE: salad bar */}
         <section className="column salad-bar">
           <div className="column-header">
             <h2>Salad bar</h2>
@@ -179,17 +176,40 @@ function App() {
                   type="button"
                   className={slots.length === size ? 'size-button active' : 'size-button'}
                   onClick={() => resizeBar(size)}
-                  title={`${size / 2} + ${size / 2}`}
+                  title={`${Math.ceil(size / 2)} + ${Math.floor(size / 2)}`}
                 >
                   {size}
                 </button>
               ))}
+
               <button
                 type="button"
                 className="size-button"
-                onClick={addColumn}
+                onClick={() => resizeBar(slots.length - 1)}
+                disabled={slots.length <= MIN_SLOTS}
+                title="Remove one slot"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                className="size-input"
+                min={MIN_SLOTS}
+                max={MAX_SLOTS}
+                value={sizeInput}
+                onChange={(e) => setSizeInput(e.target.value)}
+                onBlur={applySizeInput}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') applySizeInput()
+                }}
+                title={`Own size (${MIN_SLOTS}–${MAX_SLOTS})`}
+              />
+              <button
+                type="button"
+                className="size-button"
+                onClick={() => resizeBar(slots.length + 1)}
                 disabled={slots.length >= MAX_SLOTS}
-                title="Add one column (2 slots)"
+                title="Add one slot"
               >
                 +
               </button>
@@ -202,7 +222,6 @@ function App() {
               : 'Click a product on the left, then click a slot'}
           </p>
 
-          {/* Always 2 rows; the number of columns follows the slot count */}
           <div
             className="slot-grid"
             style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
@@ -227,7 +246,7 @@ function App() {
                       type="button"
                       className="slot-clear"
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation() // don't also trigger the slot's own click
                         clearSlot(index)
                       }}
                     >
@@ -242,9 +261,20 @@ function App() {
           </div>
         </section>
 
-        {/* RIGHT: cost accounting */}
         <aside className="column costs">
-          <h2>Cost accounting</h2>
+                    <div className="column-header">
+            <button
+              type="button"
+              className="toggle-products"
+              onClick={() => setShowCosts(!showCosts)}
+              title={showCosts ? 'Hide cost accounting' : 'Show cost accounting'}
+            >
+              {showCosts ? '›' : '‹'}
+            </button>
+            {showCosts && <h2>Cost accounting</h2>}
+          </div>
+
+          {showCosts && <>{/* cost accounting content goes here */}</>}
         </aside>
       </main>
     </>
