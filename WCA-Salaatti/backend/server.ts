@@ -241,6 +241,140 @@ app.post("/api/plans", async (req, res) => {
   }
 });
 
+app.put("/api/plans/:id", async (req, res) => {
+  const planId = Number(req.params.id);
+
+  if(!Number.isInteger(planId) || planId <= 0)
+  {
+    return res.status(400).json({ error: "Invalid plan id" });
+  }
+
+  if(!isPlanInput(req.body))
+  {
+    return res.status(400).json({ error: "Invalid plan entry"});
+  }
+
+  const updatedPlan: plan = {
+    name: req.body.name.trim(),
+    cartId: req.body.cartId.trim(),
+    positions: req.body.positions
+  };
+
+  let validation;
+
+  try
+  {
+    validation = await validatePlan(updatedPlan, pool);
+  }
+
+  catch(error)
+  {
+    console.error(
+      "Plan validation quary failed:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
+
+    return res.status(500).json({
+      error: "Could not validate the plan"
+    });
+
+  }
+
+  if(!validation.valid)
+  {
+    return res.status(400).json({
+      error: "Invalid plan entry",
+      details: validation.errors
+    });
+  }
+
+  let connection:
+    | Awaited<ReturnType<typeof pool.getConnection>>
+    | undefined;
+
+    let transactionStarted = false;
+
+    try
+    {
+      connection = await pool.getConnection();
+
+      const [existingPlans] = await connection.execute<RowDataPacket[]>(
+        `SELECT id FROM plans WHERE id = ? `,
+        [planId]
+      );
+
+      if(existingPlans.length === 0)
+      {
+        return res.status(404).json({
+          error: "Plan not found"
+        });
+      }
+
+      await connection.beginTransaction();
+      transactionStarted = true;
+
+      await connection.execute(
+        `UPDATE plans
+        SET name = ?, cart_id = ?
+        WHERE id = ?`,
+        [
+          updatedPlan.name,
+          updatedPlan.cartId,
+          planId
+        ]
+      );
+
+      await connection.execute(
+        `DELETE FROM plan_positions
+        WHERE plan_id = ?`,
+        [planId]
+      );
+
+      for(const position of updatedPlan.positions) 
+      {
+        if (position.productId === null)
+        {
+          continue;
+        }
+      
+      await connection.execute(
+        `INSERT INTO plan_positions
+        (plan_id, position_number,product_id)
+        VALUES (?, ?, ?)`,
+        [
+          planId,
+          position.positionNumber,
+          position.productId          
+        ]
+      );
+    }
+
+    await connection.commit();
+    transactionStarted = false;
+
+    res.status(200).json({
+      id: planId,
+      ...updatedPlan
+    });
+  }
+  catch(error)
+  {
+    if (transactionStarted && connection)
+    {
+      try{
+        await connection.rollback();
+      } catch (rollbackError) {
+        console.error(
+          "Plan transaction rollback failed:",
+          rollbackError instanceof Error
+          ? rollbackError instanceof Error 
+          : "Unknown error"
+        );
+      }
+    }
+    
+    console.error(
+      "Could not update plan:",
 app.delete("/api/plans/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -335,6 +469,14 @@ const plan = planRows[0];
       : "Unknown error"
     );
 
+    res.status(500).json({
+      error: "Could not update the plan"
+    });
+  } finally 
+  {
+    connection?.release();
+  }
+});
     return res.status(500).json({
       error: "Could not load plan"
     });
