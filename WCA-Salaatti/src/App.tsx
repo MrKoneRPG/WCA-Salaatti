@@ -1,7 +1,8 @@
-import { useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 import './App.css'
 import type { ProductData } from './types/ProductData'
 import Product from './components/Product'
+import ProductBrowser from './components/ProductBrowser'
 
 const SIZE_TEMPLATES = [10, 15]
 const DEFAULT_SIZE = 10
@@ -17,7 +18,6 @@ function App() {
   const [serverEntries, setServerEntries] = useState<ProductData[]>([])
   const [loadError, setLoadError] = useState('')
   const [loaded, setLoaded] = useState(false)
-  const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<ProductData | null>(null)
   const [slots, setSlots] = useState<(ProductData | null)[]>(Array(DEFAULT_SIZE).fill(null))
   const [sizeInput, setSizeInput] = useState(String(DEFAULT_SIZE))
@@ -42,13 +42,6 @@ function App() {
       setLoadError('Could not connect to the backend.')
     }
   }
-
-  const searchTerm = search.trim().toLowerCase()
-  const visibleProducts = serverEntries.filter(
-    (entry) =>
-      entry.productName.toLowerCase().includes(searchTerm) ||
-      String(entry.productCode).toLowerCase().includes(searchTerm),
-  )
 
   function selectProduct(product: ProductData) {
     setSelected(selected === product ? null : product)
@@ -103,10 +96,7 @@ function App() {
         </nav>
       </header>
 
-      <main
-        className="layout"
-        style={{ '--layout-columns': layoutColumns } as CSSProperties}
-      >
+      <main className="layout" style={{ gridTemplateColumns: layoutColumns }}>
         <aside className="column products">
           <div className="column-header">
             {showProducts && <h2>Products</h2>}
@@ -133,38 +123,21 @@ function App() {
                   </button>
                   {loadError && <p>{loadError}</p>}
                 </>
-              ) : (
-                <input
-                  type="search"
-                  className="product-search"
-                  placeholder="Search products..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              )}
+              ) : 
 
-              {loaded && visibleProducts.length === 0 && (
-                <p className="no-results">No products match "{search}".</p>
-              )}
+              <ProductBrowser
+                products={serverEntries}
+                onProductSelect={(productId) => {
+                const product = serverEntries.find(
+                (p) => p.id === productId
+                  );
 
-              <ul className="product-grid">
-                {visibleProducts.map((entry) => (
-                  <li
-                    // productCode alone isn't unique in the data, so name is added
-                    key={`${entry.productCode}-${entry.productName}`}
-                    className={selected === entry ? 'product-card selected' : 'product-card'}
-                    onClick={() => selectProduct(entry)}
-                  >
-                    {entry.imageUrl ? (
-                      <img src={entry.imageUrl} alt={entry.productName} />
-                    ) : (
-                      <div className="no-image">{entry.productName.charAt(0)}</div>
-                    )}
-                    <span>{entry.productName}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
+                 if (product) {
+                selectProduct(product);
+               }
+               }}
+              />
+              }</>
           )}
         </aside>
 
@@ -227,7 +200,7 @@ function App() {
 
           <div
             className="slot-grid"
-            style={{ gridTemplateColumns: `repeat(${columns}, minmax(64px, 1fr))` }}
+            style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
           >
             {slots.map((product, index) => (
               <div
@@ -265,7 +238,7 @@ function App() {
         </section>
 
         <aside className="column costs">
-          <div className="column-header">
+                    <div className="column-header">
             <button
               type="button"
               className="toggle-products"
