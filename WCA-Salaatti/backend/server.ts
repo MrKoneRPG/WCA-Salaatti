@@ -367,7 +367,7 @@ app.put("/api/plans/:id", async (req, res) => {
         console.error(
           "Plan transaction rollback failed:",
           rollbackError instanceof Error
-          ? rollbackError instanceof Error 
+          ? rollbackError.message
           : "Unknown error"
         );
       }
@@ -375,6 +375,17 @@ app.put("/api/plans/:id", async (req, res) => {
     
     console.error(
       "Could not update plan:",
+      error instanceof Error
+      ? error.message
+      : "Unknown error"
+    );
+    res.status(500).json({
+      error: "Could not update the plan"
+    });
+  } finally {
+    connection?.release();
+  }
+});
 app.delete("/api/plans/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -472,16 +483,9 @@ const plan = planRows[0];
     res.status(500).json({
       error: "Could not update the plan"
     });
-  } finally 
-  {
-    connection?.release();
-  }
+  } 
 });
-    return res.status(500).json({
-      error: "Could not load plan"
-    });
-  }
-  });
+    
   
 
 
