@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import './App.css'
 import type { ProductData } from './types/ProductData'
 import Product from './components/Product'
 import ProductBrowser from './components/ProductBrowser'
 import SavedPlansPage from './pages/SavedPlansPage'
 import { fetchCarts, fetchPlan, savePlan } from './api/plansApi'
-import type { categories as Cart } from './types/Cart'
+import type { Cart } from './types/Cart'
 
 const SIZE_TEMPLATES = [10, 15]
 const DEFAULT_SIZE = 10
@@ -55,13 +55,6 @@ function App() {
     setHasUnsavedChanges(true)
     setPlanMessage('')
   }
-
-  const searchTerm = search.trim().toLowerCase()
-  const visibleProducts = serverEntries.filter(
-    (entry) =>
-      entry.productName.toLowerCase().includes(searchTerm) ||
-      String(entry.productCode).toLowerCase().includes(searchTerm),
-  )
 
   function selectProduct(product: ProductData) {
     setSelected(selected === product ? null : product)
@@ -235,50 +228,6 @@ function App() {
         </nav>
       </header>
 
-      <main className="layout" style={{ gridTemplateColumns: layoutColumns }}>
-        <aside className="column products">
-          <div className="column-header">
-            {showProducts && <h2>Products</h2>}
-            <button
-              type="button"
-              className="toggle-products"
-              onClick={() => setShowProducts(!showProducts)}
-              title={showProducts ? 'Hide products' : 'Show products'}
-            >
-              {showProducts ? '‹' : '›'}
-            </button>
-          </div>
-
-          {showProducts && (
-            <>
-              {entries.map((entry) => (
-                <Product key={entry.productCode} entry={entry} />
-              ))}
-
-              {!loaded ? (
-                <>
-                  <button type="button" onClick={loadServerEntries}>
-                    Load from backend
-                  </button>
-                  {loadError && <p>{loadError}</p>}
-                </>
-              ) : 
-
-              <ProductBrowser
-                products={serverEntries}
-                onProductSelect={(productId) => {
-                const product = serverEntries.find(
-                (p) => p.id === productId
-                  );
-
-                 if (product) {
-                selectProduct(product);
-               }
-               }}
-              />
-              }</>
-          )}
-        </aside>
       {page === 'saved' ? (
         <SavedPlansPage
           onOpen={handleOpenPlan}
@@ -317,36 +266,14 @@ function App() {
                     {loadError && <p>{loadError}</p>}
                   </>
                 ) : (
-                  <input
-                    type="search"
-                    className="product-search"
-                    placeholder="Search products..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                  <ProductBrowser
+                    products={serverEntries}
+                    onProductSelect={(productId) => {
+                      const product = serverEntries.find((p) => p.id === productId)
+                      if (product) selectProduct(product)
+                    }}
                   />
                 )}
-
-                {loaded && visibleProducts.length === 0 && (
-                  <p className="no-results">No products match "{search}".</p>
-                )}
-
-                <ul className="product-grid">
-                  {visibleProducts.map((entry) => (
-                    <li
-                      // productCode alone isn't unique in the data, so name is added
-                      key={`${entry.productCode}-${entry.productName}`}
-                      className={selected === entry ? 'product-card selected' : 'product-card'}
-                      onClick={() => selectProduct(entry)}
-                    >
-                      {entry.imageUrl ? (
-                        <img src={entry.imageUrl} alt={entry.productName} />
-                      ) : (
-                        <div className="no-image">{entry.productName.charAt(0)}</div>
-                      )}
-                      <span>{entry.productName}</span>
-                    </li>
-                  ))}
-                </ul>
               </>
             )}
           </aside>
@@ -430,15 +357,6 @@ function App() {
                 : 'Click a product on the left, then click a slot'}
             </p>
 
-          <div
-            className="slot-grid"
-            style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-          >
-            {slots.map((product, index) => (
-              <div
-                key={index}
-                className={product ? 'slot filled' : 'slot'}
-                onClick={() => placeInSlot(index)}
             <div
               className="slot-grid"
               style={{ gridTemplateColumns: `repeat(${columns}, minmax(64px, 1fr))` }}
@@ -492,49 +410,6 @@ function App() {
               <h2>Cost accounting</h2>
             </div>
 
-                {product ? (
-                  <>
-                    {product.imageUrl ? (
-                      <img src={product.imageUrl} alt={product.productName} />
-                    ) : (
-                      <div className="no-image">{product.productName.charAt(0)}</div>
-                    )}
-                    <span>{product.productName}</span>
-                    <button
-                      type="button"
-                      className="slot-clear"
-                      onClick={(e) => {
-                        e.stopPropagation() // don't also trigger the slot's own click
-                        clearSlot(index)
-                      }}
-                    >
-                      ×
-                    </button>
-                  </>
-                ) : (
-                  <span className="slot-empty">Empty</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <aside className="column costs">
-                    <div className="column-header">
-            <button
-              type="button"
-              className="toggle-products"
-              onClick={() => setShowCosts(!showCosts)}
-              title={showCosts ? 'Hide cost accounting' : 'Show cost accounting'}
-            >
-              {showCosts ? '›' : '‹'}
-            </button>
-            {showCosts && <h2>Cost accounting</h2>}
-          </div>
-
-          {showCosts && <>{/* cost accounting content goes here */}</>}
-        </aside>
-      </main>
             {showCosts && <>{/* cost accounting content goes here */}</>}
           </aside>
         </main>

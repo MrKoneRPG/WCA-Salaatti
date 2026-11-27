@@ -1,4 +1,4 @@
-import type { categories as Cart } from '../types/Cart'
+import type { Cart } from '../types/Cart'
 import type { plan } from '../types/plan'
 
 const API_URL = 'http://localhost:3001/api'
