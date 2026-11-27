@@ -241,6 +241,30 @@ app.post("/api/plans", async (req, res) => {
   }
 });
 
+app.delete("/api/plans/:id", async (req, res) => {
+  const { id } = req.params;
+
+  if (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id))) {
+    return res.status(400).json({ error: "Plan id must be a positive whole number" });
+  }
+
+  try {
+    const [result] = await pool.execute<ResultSetHeader>(
+      `DELETE FROM plans WHERE id = ?`,
+      [Number(id)]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Plan not found" });
+    }
+
+    return res.status(204).end();
+  } catch (error) {
+    console.error("Could not delete plan:", error instanceof Error ? error.message : "Unknown error");
+    return res.status(500).json({ error: "Could not delete the plan" });
+  }
+});
+
 app.get("/api/plans/:id" , async (req,res) =>{
   const { id } = req.params;
 
