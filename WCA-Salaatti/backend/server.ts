@@ -15,7 +15,8 @@ const PRODUCT_COLUMNS = `
   price,
   image AS imageUrl,
   packageSize,
-  dietaryInfo
+  dietaryInfo,
+  categoryId
 `;
 
 function toProduct(row: RowDataPacket) {
@@ -141,9 +142,9 @@ app.post("/api/products", async (req, res) => {
 app.get("/api/categories", async (req, res) => {
   try{
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT id, productCategories
-      FROM productCategories
-      ORDER BY id`
+      `SELECT id, productCategories AS name
+       FROM categories
+       ORDER BY id`
     );
     res.json(rows);
   }
