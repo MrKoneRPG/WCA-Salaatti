@@ -1,7 +1,8 @@
-import { useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 import './App.css'
 import type { ProductData } from './types/ProductData'
 import Product from './components/Product'
+import ProductBrowser from './components/ProductBrowser'
 import SavedPlansPage from './pages/SavedPlansPage'
 import { fetchCarts, fetchPlan, savePlan } from './api/plansApi'
 import type { categories as Cart } from './types/Cart'
@@ -20,7 +21,6 @@ function App() {
   const [serverEntries, setServerEntries] = useState<ProductData[]>([])
   const [loadError, setLoadError] = useState('')
   const [loaded, setLoaded] = useState(false)
-  const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<ProductData | null>(null)
   const [slots, setSlots] = useState<(ProductData | null)[]>(Array(DEFAULT_SIZE).fill(null))
   const [sizeInput, setSizeInput] = useState(String(DEFAULT_SIZE))
@@ -235,6 +235,50 @@ function App() {
         </nav>
       </header>
 
+      <main className="layout" style={{ gridTemplateColumns: layoutColumns }}>
+        <aside className="column products">
+          <div className="column-header">
+            {showProducts && <h2>Products</h2>}
+            <button
+              type="button"
+              className="toggle-products"
+              onClick={() => setShowProducts(!showProducts)}
+              title={showProducts ? 'Hide products' : 'Show products'}
+            >
+              {showProducts ? '‹' : '›'}
+            </button>
+          </div>
+
+          {showProducts && (
+            <>
+              {entries.map((entry) => (
+                <Product key={entry.productCode} entry={entry} />
+              ))}
+
+              {!loaded ? (
+                <>
+                  <button type="button" onClick={loadServerEntries}>
+                    Load from backend
+                  </button>
+                  {loadError && <p>{loadError}</p>}
+                </>
+              ) : 
+
+              <ProductBrowser
+                products={serverEntries}
+                onProductSelect={(productId) => {
+                const product = serverEntries.find(
+                (p) => p.id === productId
+                  );
+
+                 if (product) {
+                selectProduct(product);
+               }
+               }}
+              />
+              }</>
+          )}
+        </aside>
       {page === 'saved' ? (
         <SavedPlansPage
           onOpen={handleOpenPlan}
@@ -386,6 +430,15 @@ function App() {
                 : 'Click a product on the left, then click a slot'}
             </p>
 
+          <div
+            className="slot-grid"
+            style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+          >
+            {slots.map((product, index) => (
+              <div
+                key={index}
+                className={product ? 'slot filled' : 'slot'}
+                onClick={() => placeInSlot(index)}
             <div
               className="slot-grid"
               style={{ gridTemplateColumns: `repeat(${columns}, minmax(64px, 1fr))` }}
@@ -439,6 +492,49 @@ function App() {
               <h2>Cost accounting</h2>
             </div>
 
+                {product ? (
+                  <>
+                    {product.imageUrl ? (
+                      <img src={product.imageUrl} alt={product.productName} />
+                    ) : (
+                      <div className="no-image">{product.productName.charAt(0)}</div>
+                    )}
+                    <span>{product.productName}</span>
+                    <button
+                      type="button"
+                      className="slot-clear"
+                      onClick={(e) => {
+                        e.stopPropagation() // don't also trigger the slot's own click
+                        clearSlot(index)
+                      }}
+                    >
+                      ×
+                    </button>
+                  </>
+                ) : (
+                  <span className="slot-empty">Empty</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <aside className="column costs">
+                    <div className="column-header">
+            <button
+              type="button"
+              className="toggle-products"
+              onClick={() => setShowCosts(!showCosts)}
+              title={showCosts ? 'Hide cost accounting' : 'Show cost accounting'}
+            >
+              {showCosts ? '›' : '‹'}
+            </button>
+            {showCosts && <h2>Cost accounting</h2>}
+          </div>
+
+          {showCosts && <>{/* cost accounting content goes here */}</>}
+        </aside>
+      </main>
             {showCosts && <>{/* cost accounting content goes here */}</>}
           </aside>
         </main>
