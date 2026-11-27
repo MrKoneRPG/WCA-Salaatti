@@ -1,0 +1,104 @@
+.cart-selection {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.cart-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cart-option.selected {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.cart-option-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-name,
+.plan-position-product-name {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.cart-capacity {
+  font-size: 0.875em;
+}
+
+.plan-position {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 12px 12px;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.plan-position-number {
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  font-size: 0.8em;
+}
+
+.plan-position-image,
+.plan-position-image-fallback {
+  width: min(100%, 120px);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.plan-position-image-fallback {
+  display: grid;
+  place-items: center;
+  background: var(--code-bg);
+  color: var(--text);
+  font-size: 0.85em;
+}
+
+.plan-position-empty {
+  color: var(--text);
+}
+
+.plan-position-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.plan-position button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}
+
+.cart-option:focus-within,
+.cart-option input:focus-visible,
+.plan-position button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
