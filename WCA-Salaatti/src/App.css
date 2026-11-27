@@ -410,6 +410,30 @@
   color: #e5484d;
 }
 
+/* ---------- Category filter buttons ---------- */
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.category-button {
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: none;
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.category-button.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
 /* ---------- Phones and small tablets ---------- */
 @media (max-width: 700px) {
   /* Let the page grow and scroll instead of fitting one screen */

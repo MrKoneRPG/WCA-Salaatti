@@ -4,6 +4,7 @@ export type ProductData = {
   EAN: number;
   productName: string;
   category: string;
+  categoryId: number | null;
   packageSize: number;
   GnSize: string;
   price: number;

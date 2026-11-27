@@ -6,6 +6,7 @@ import ProductBrowser from './components/ProductBrowser'
 import SavedPlansPage from './pages/SavedPlansPage'
 import { fetchCarts, fetchPlan, savePlan } from './api/plansApi'
 import type { Cart } from './types/Cart'
+import type { Category } from './types/Category'
 
 const SIZE_TEMPLATES = [10, 15]
 const DEFAULT_SIZE = 10
@@ -19,6 +20,7 @@ const COLLAPSED_WIDTH = '62px'
 function App() {
   const [entries] = useState<ProductData[]>([])
   const [serverEntries, setServerEntries] = useState<ProductData[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loadError, setLoadError] = useState('')
   const [loaded, setLoaded] = useState(false)
   const [selected, setSelected] = useState<ProductData | null>(null)
@@ -39,10 +41,15 @@ function App() {
   async function loadServerEntries(): Promise<ProductData[] | null> {
     setLoadError('')
     try {
-      const response = await fetch('http://localhost:3001/api/products')
-      if (!response.ok) throw new Error('Could not load entries')
-      const products: ProductData[] = await response.json()
+      const [productResponse, categoryResponse] = await Promise.all([
+        fetch('http://localhost:3001/api/products'),
+        fetch('http://localhost:3001/api/categories'),
+      ])
+      if (!productResponse.ok || !categoryResponse.ok) throw new Error('Could not load entries')
+      const products: ProductData[] = await productResponse.json()
+      const categoryRows: Category[] = await categoryResponse.json()
       setServerEntries(products)
+      setCategories(categoryRows)
       setLoaded(true)
       return products
     } catch {
@@ -268,6 +275,7 @@ function App() {
                 ) : (
                   <ProductBrowser
                     products={serverEntries}
+                    categories={categories}
                     onProductSelect={(productId) => {
                       const product = serverEntries.find((p) => p.id === productId)
                       if (product) selectProduct(product)
